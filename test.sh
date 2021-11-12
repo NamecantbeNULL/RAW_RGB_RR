@@ -1,0 +1,1 @@
+python test.py --dataroot datasets --name RAW_RGB_RR --model RAWRR --dataset_mode rawrr  --preprocess "" --no_flip --epoch final --gpu_ids 0``

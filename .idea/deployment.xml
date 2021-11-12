@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="On explicit save action" serverName="doublebin@10.113.160.200:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="doublebin@10.113.160.200:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/doublebin/RAW_dereflection" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="doublebin@10.113.178.176:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/doublebin/IBCLN-MPRNet" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ON_EXPLICIT_SAVE" />
+  </component>
+</project>
