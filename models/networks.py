@@ -925,9 +925,9 @@ class SynData:
     def __call__(self, t_rgb: torch.Tensor, r_rgb: torch.Tensor, k_sz):
         device = self.device
         t = t_rgb.pow(2.2)
-        # t = inverse_smoothstep(t)
+        t = inverse_smoothstep(t)
         r = r_rgb.pow(2.2)
-        # r = inverse_smoothstep(r)
+        r = inverse_smoothstep(r)
 
         sigma = k_sz[np.random.randint(0, len(k_sz))]
         att = 1.08 + np.random.random() / 10.0
@@ -951,14 +951,14 @@ class SynData:
         r_blur_mask = r_blur * alpha1
         blend = r_blur_mask + t * alpha2
 
-        # t_rgb = smoothstep(t)
-        t_rgb = t
+        t_rgb = smoothstep(t)
+        # t_rgb = t
         t_rgb = t_rgb.pow(1 / 2.2)
-        # r_blur_mask_rgb = smoothstep(r_blur_mask)
-        r_blur_mask_rgb = r_blur_mask
+        r_blur_mask_rgb = smoothstep(r_blur_mask)
+        # r_blur_mask_rgb = r_blur_mask
         r_blur_mask_rgb = r_blur_mask_rgb.pow(1 / 2.2)
         blend_rgb = blend.clamp(min=0, max=1)
-        # blend_rgb = smoothstep(blend_rgb)
+        blend_rgb = smoothstep(blend_rgb)
         blend_rgb = blend_rgb
         blend_rgb = blend_rgb.pow(1 / 2.2)
         blend_rgb = blend_rgb.clamp(min=0, max=1)
