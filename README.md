@@ -1,5 +1,4 @@
 # Real-scene Reflection Removal with RAW-RGB Image Pairs
-<<<<<<< HEAD
 
 An official implementation code for paper "Real-scene Reflection Removal with RAW-RGB Image Pairs"
 
