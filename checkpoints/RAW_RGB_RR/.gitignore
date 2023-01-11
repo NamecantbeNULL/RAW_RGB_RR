@@ -1,4 +1,8 @@
 # This file is created to preserve this directory
 *
 # Except this file
+<<<<<<< HEAD
 !.gitignore
+=======
+!.gitignore
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912

@@ -169,7 +169,11 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
         net = UnetGenerator(input_nc, output_nc, 8, ngf, norm_layer=norm_layer, use_dropout=use_dropout)
     elif netG == 'gen_drop':
         # net = Generator_drop(input_nc, output_nc, ngf)
+<<<<<<< HEAD
+        net = MCDRNet(input_nc, output_nc, ngf)
+=======
         net = RAWRRNet(input_nc, output_nc, ngf)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
     else:
         raise NotImplementedError('Generator model name [%s] is not recognized' % netG)
 
@@ -917,6 +921,10 @@ def smoothstep(image):
   """Approximately inverts a global tone mapping curve."""
   return 3.0 * image.pow(2) - 2.0 * image.pow(3)
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 class SynData:
     def __init__(self, device):
         self.g_mask = torch.tensor(g_mask.transpose(2, 0, 1)).to(device)
@@ -925,9 +933,15 @@ class SynData:
     def __call__(self, t_rgb: torch.Tensor, r_rgb: torch.Tensor, k_sz):
         device = self.device
         t = t_rgb.pow(2.2)
+<<<<<<< HEAD
+        # t = inverse_smoothstep(t)
+        r = r_rgb.pow(2.2)
+        # r = inverse_smoothstep(r)
+=======
         t = inverse_smoothstep(t)
         r = r_rgb.pow(2.2)
         r = inverse_smoothstep(r)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         sigma = k_sz[np.random.randint(0, len(k_sz))]
         att = 1.08 + np.random.random() / 10.0
@@ -951,6 +965,16 @@ class SynData:
         r_blur_mask = r_blur * alpha1
         blend = r_blur_mask + t * alpha2
 
+<<<<<<< HEAD
+        # t_rgb = smoothstep(t)
+        t_rgb = t
+        t_rgb = t_rgb.pow(1 / 2.2)
+        # r_blur_mask_rgb = smoothstep(r_blur_mask)
+        r_blur_mask_rgb = r_blur_mask
+        r_blur_mask_rgb = r_blur_mask_rgb.pow(1 / 2.2)
+        blend_rgb = blend.clamp(min=0, max=1)
+        # blend_rgb = smoothstep(blend_rgb)
+=======
         t_rgb = smoothstep(t)
         # t_rgb = t
         t_rgb = t_rgb.pow(1 / 2.2)
@@ -959,6 +983,7 @@ class SynData:
         r_blur_mask_rgb = r_blur_mask_rgb.pow(1 / 2.2)
         blend_rgb = blend.clamp(min=0, max=1)
         blend_rgb = smoothstep(blend_rgb)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         blend_rgb = blend_rgb
         blend_rgb = blend_rgb.pow(1 / 2.2)
         blend_rgb = blend_rgb.clamp(min=0, max=1)
@@ -1233,6 +1258,57 @@ class NonLocalBlock2D(nn.Module):
 
 
 ##########################################################################
+<<<<<<< HEAD
+## Amplifier
+class amplifier(nn.Module):
+    def __init__(self, n_feat, kernel_size, bias, cha):
+        super(amplifier, self).__init__()
+        self.conv2 = conv(n_feat, cha, kernel_size, bias=bias)
+        self.coe_a = nn.Sequential(conv(cha, n_feat, kernel_size, bias=bias), nn.PReLU(),
+                                   conv(n_feat, n_feat, kernel_size, bias=bias), nn.PReLU(),
+                                   conv(n_feat, cha, kernel_size, bias=bias), nn.Sigmoid())
+
+    def forward(self, x, x_img):
+        amp = self.coe_a(x_img)
+        img = self.conv2(x) + x_img
+        img = img * amp
+        return img
+
+
+## Spatial Channel Attention Module
+class SCAM(nn.Module):
+    def __init__(self, n_feat, kernel_size, bias, cha, reduction):
+        super(SCAM, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc1 = nn.Conv2d(n_feat, n_feat // reduction, kernel_size=1, padding=0)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc2 = nn.Conv2d(n_feat // reduction, n_feat, kernel_size=1, padding=0)
+        self.sigmoid = nn.Sigmoid()
+
+        self.spatial_se = nn.Sequential(
+            nn.Conv2d(n_feat, 1, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.Sigmoid())
+
+        self.conv1 = conv(n_feat, n_feat, kernel_size, bias=bias)
+        self.conv2 = nn.Sequential(conv(cha, n_feat, kernel_size, bias=bias), nn.PReLU())
+        self.conv3 = nn.Sequential(conv(cha, n_feat, kernel_size, bias=bias), nn.PReLU())
+
+    def forward(self, x, img):
+        x1 = self.conv1(x)
+
+        x2 = self.conv2(img)
+        fea_c = self.avg_pool(x2)
+        fea_c = self.fc1(fea_c)
+        fea_c = self.relu(fea_c)
+        fea_c = self.fc2(fea_c)
+        chn_se = self.sigmoid(fea_c)
+        chn_se = chn_se * x1
+
+        x3 = self.conv3(img)
+        spa_se = self.spatial_se(x3)
+        out = chn_se * spa_se
+        return out
+=======
 ## Non-local Attention Module
 class NAM(nn.Module):
     def __init__(self, n_feat, kernel_size, bias, cha):
@@ -1255,6 +1331,7 @@ class NAM(nn.Module):
         x1 = x1*x2
         x1 = x1+x
         return x1
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
 
 class RRM(nn.Module):
@@ -1279,7 +1356,10 @@ class RRM(nn.Module):
                                    conv(n_feat, n_feat, 1, bias=bias), nn.PReLU(),
                                    conv(n_feat, n_feat, 1, bias=bias))
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
     def forward(self, fea_r, fea_b):
         fea_r = self.DM_r(fea_r)
         fea_r = self.GCM_r(fea_r)
@@ -1288,7 +1368,12 @@ class RRM(nn.Module):
 
         return torch.cat([fea_r, fea_b], 1)
 
+<<<<<<< HEAD
+
+# ------------- from MSPNet --------------#
+=======
 # ------------- from MPRNet --------------#
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 ##########################################################################
 class Encoder(nn.Module):
     def __init__(self, n_feat, kernel_size, reduction, act, bias, scale_unetfeats, csff):
@@ -1304,9 +1389,14 @@ class Encoder(nn.Module):
         self.encoder_level2 = nn.Sequential(*self.encoder_level2)
         self.encoder_level3 = nn.Sequential(*self.encoder_level3)
 
+<<<<<<< HEAD
+        self.down12 = DownSample(n_feat, scale_unetfeats)
+        self.down23 = DownSample(n_feat + scale_unetfeats, scale_unetfeats)
+=======
         self.thicken12 = nn.Sequential(nn.Conv2d(n_feat, n_feat + scale_unetfeats, 1, stride=1, padding=0, bias=False))
         self.thicken23 = nn.Sequential(nn.Conv2d(n_feat + scale_unetfeats, n_feat + (scale_unetfeats * 2), 1, stride=1,
                                                  padding=0, bias=False))
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         # Cross Stage Feature Fusion (CSFF)
         if csff:
@@ -1325,13 +1415,21 @@ class Encoder(nn.Module):
         if (encoder_outs is not None) and (decoder_outs is not None):
             enc1 = enc1 + self.csff_enc1(encoder_outs[0]) + self.csff_dec1(decoder_outs[0])
 
+<<<<<<< HEAD
+        x = self.down12(enc1)
+=======
         x = self.thicken12(enc1)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         enc2 = self.encoder_level2(x)
         if (encoder_outs is not None) and (decoder_outs is not None):
             enc2 = enc2 + self.csff_enc2(encoder_outs[1]) + self.csff_dec2(decoder_outs[1])
 
+<<<<<<< HEAD
+        x = self.down23(enc2)
+=======
         x = self.thicken23(enc2)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         enc3 = self.encoder_level3(x)
         if (encoder_outs is not None) and (decoder_outs is not None):
@@ -1357,6 +1455,19 @@ class Decoder(nn.Module):
         self.skip_attn1 = DCAB(n_feat, kernel_size, reduction, bias=bias, act=act)
         self.skip_attn2 = DCAB(n_feat + scale_unetfeats, kernel_size, reduction, bias=bias, act=act, dilation=2)
 
+<<<<<<< HEAD
+        self.up21 = SkipUpSample(n_feat, scale_unetfeats)
+        self.up32 = SkipUpSample(n_feat + scale_unetfeats, scale_unetfeats)
+
+    def forward(self, outs):
+        enc1, enc2, enc3 = outs
+        dec3 = self.decoder_level3(enc3)
+
+        x = self.up32(dec3, self.skip_attn2(enc2))
+        dec2 = self.decoder_level2(x)
+
+        x = self.up21(dec2, self.skip_attn1(enc1))
+=======
         # self.fe1 = FELayer(n_feat, reduction, bias=bias, pool=pool)
         # self.fe2 = FELayer(n_feat + scale_unetfeats, reduction, bias=bias, pool=pool)
         self.fe3 = FELayer(n_feat + (scale_unetfeats * 2), reduction, bias=bias, pool=pool)
@@ -1373,11 +1484,50 @@ class Decoder(nn.Module):
         dec2 = self.decoder_level2(x)
 
         x = self.thin21(dec2) + self.skip_attn1(enc1)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         dec1 = self.decoder_level1(x)
 
         return [dec1, dec2, dec3]
 
 
+<<<<<<< HEAD
+##---------- Resizing Modules ----------
+class DownSample(nn.Module):
+    def __init__(self, in_channels, s_factor):
+        super(DownSample, self).__init__()
+        self.down = nn.Sequential(nn.Upsample(scale_factor=0.5, mode='bilinear', align_corners=False),
+                                  nn.Conv2d(in_channels, in_channels + s_factor, 1, stride=1, padding=0, bias=False))
+
+    def forward(self, x):
+        x = self.down(x)
+        return x
+
+
+class UpSample(nn.Module):
+    def __init__(self, in_channels, s_factor):
+        super(UpSample, self).__init__()
+        self.up = nn.Sequential(nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+                                nn.Conv2d(in_channels + s_factor, in_channels, 1, stride=1, padding=0, bias=False))
+
+    def forward(self, x):
+        x = self.up(x)
+        return x
+
+
+class SkipUpSample(nn.Module):
+    def __init__(self, in_channels, s_factor):
+        super(SkipUpSample, self).__init__()
+        self.up = nn.Sequential(nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+                                nn.Conv2d(in_channels + s_factor, in_channels, 1, stride=1, padding=0, bias=False))
+
+    def forward(self, x, y):
+        x = self.up(x)
+        x = x + y
+        return x
+
+
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 ##########################################################################
 ## Residual Block (RB)
 class RB(nn.Module):
@@ -1403,6 +1553,15 @@ class ResNet(nn.Module):
         self.orb2 = RB(n_feat + scale_resnetfeats, kernel_size, reduction, act, bias, num_cab)
         self.orb3 = RB(n_feat + scale_resnetfeats, kernel_size, reduction, act, bias, num_cab)
 
+<<<<<<< HEAD
+        self.up_enc1 = UpSample(n_feat, scale_edecoderfeats)
+        self.up_dec1 = UpSample(n_feat, scale_edecoderfeats)
+
+        self.up_enc2 = nn.Sequential(UpSample(n_feat + scale_edecoderfeats, scale_edecoderfeats),
+                                     UpSample(n_feat, scale_edecoderfeats))
+        self.up_dec2 = nn.Sequential(UpSample(n_feat + scale_edecoderfeats, scale_edecoderfeats),
+                                     UpSample(n_feat, scale_edecoderfeats))
+=======
         self.thin_enc1 = nn.Conv2d(n_feat + scale_edecoderfeats, n_feat, 1, stride=1, padding=0, bias=False)
         self.thin_dec1 = nn.Conv2d(n_feat + scale_edecoderfeats, n_feat, 1, stride=1, padding=0, bias=False)
 
@@ -1412,6 +1571,7 @@ class ResNet(nn.Module):
         self.thin_dec2 = nn.Sequential(nn.Conv2d(n_feat + (scale_edecoderfeats * 2), n_feat + scale_edecoderfeats, 1, stride=1,
                                                  padding=0, bias=False),
                                        nn.Conv2d(n_feat + scale_edecoderfeats, n_feat, 1, stride=1, padding=0, bias=False))
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         self.conv_enc1 = nn.Sequential(nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
                                        nn.Conv2d(n_feat, n_feat + scale_resnetfeats, kernel_size=1, bias=bias))
@@ -1432,15 +1592,55 @@ class ResNet(nn.Module):
         x = x + self.conv_enc1(encoder_outs[0]) + self.conv_dec1(decoder_outs[0])
 
         x = self.orb2(x)
+<<<<<<< HEAD
+        x = x + self.conv_enc2(self.up_enc1(encoder_outs[1])) + self.conv_dec2(self.up_dec1(decoder_outs[1]))
+
+        x = self.orb3(x)
+        x = x + self.conv_enc3(self.up_enc2(encoder_outs[2])) + self.conv_dec3(self.up_dec2(decoder_outs[2]))
+=======
         x = x + self.conv_enc2(self.thin_enc1(encoder_outs[1])) + self.conv_dec2(self.thin_dec1(decoder_outs[1]))
 
         x = self.orb3(x)
         x = x + self.conv_enc3(self.thin_enc2(encoder_outs[2])) + self.conv_dec3(self.thin_dec2(decoder_outs[2]))
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         return x
 
 
 ##########################################################################
+<<<<<<< HEAD
+class MCDRNet(nn.Module):
+    def __init__(self, in_c=3, out_c=3, n_feat=40, scale_edecoderfeats=20, scale_resnetfeats=16, num_cab=8, kernel_size=3,
+                 reduction=4, bias=False):
+        super(MCDRNet, self).__init__()
+
+        act = nn.PReLU()
+        self.shallow_feat1_r = nn.Sequential(conv(4, n_feat, kernel_size, bias=bias),
+                                             DCAB(n_feat, kernel_size, reduction, bias=bias, act=act))
+        self.shallow_feat1_t = nn.Sequential(conv(4, n_feat, kernel_size, bias=bias),
+                                             DCAB(n_feat, kernel_size, reduction, bias=bias, act=act))
+        self.shallow_feat2_r = nn.Sequential(conv(in_c, n_feat, kernel_size, bias=bias),
+                                             DCAB(n_feat, kernel_size, reduction, bias=bias, act=act))
+        self.shallow_feat2_t = nn.Sequential(conv(in_c, n_feat, kernel_size, bias=bias),
+                                             DCAB(n_feat, kernel_size, reduction, bias=bias, act=act))
+
+        self.stage1_encoder_r = Encoder(n_feat, kernel_size, reduction, act, bias, scale_edecoderfeats, csff=False)
+        self.stage1_decoder_r = Decoder(n_feat, kernel_size, reduction, act, bias, scale_edecoderfeats, pool='avg')
+        self.stage1_rconv = conv(n_feat, 4, kernel_size, bias=bias)
+        self.stage1_encoder_t = Encoder(n_feat, kernel_size, reduction, act, bias, scale_edecoderfeats, csff=False)
+        self.stage1_decoder_t = Decoder(n_feat, kernel_size, reduction, act, bias, scale_edecoderfeats, pool='max')
+        self.stage1_tconv = conv(n_feat, 4, kernel_size, bias=bias)
+
+        self.stage2_orsnet_r = ResNet(n_feat, scale_resnetfeats, kernel_size, reduction, act, bias, scale_edecoderfeats,
+                                      num_cab)
+        self.stage2_orsnet_t = ResNet(n_feat, scale_resnetfeats, kernel_size, reduction, act, bias, scale_edecoderfeats,
+                                      num_cab)
+
+        self.scam1_r = SCAM(n_feat, kernel_size=1, bias=bias, cha=4, reduction=4)
+        self.scam1_t = SCAM(n_feat, kernel_size=1, bias=bias, cha=4, reduction=4)
+
+        self.concat1_t = conv(n_feat * 2, n_feat, kernel_size, bias=bias)
+=======
 class RAWRRNet(nn.Module):
     def __init__(self, in_c=3, out_c=3, n_feat=40, scale_edecoderfeats=20, scale_resnetfeats=16, num_cab=8, kernel_size=3,
                  reduction=4, bias=False):
@@ -1471,14 +1671,20 @@ class RAWRRNet(nn.Module):
         self.nam1_t = NAM(n_feat, kernel_size=1, bias=bias, cha=4)
 
 
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         self.concat2_r = conv(n_feat * 3, n_feat + scale_resnetfeats, kernel_size, bias=bias)
         self.concat2_t = conv(n_feat * 4 + scale_resnetfeats, n_feat + scale_resnetfeats, kernel_size, bias=bias)
 
         self.RRM = RRM(n_feat, kernel_size, bias)
 
+<<<<<<< HEAD
+        self.tail_r = conv(n_feat + scale_resnetfeats, out_c, kernel_size, bias=bias)
+        self.tail_t = conv(n_feat + scale_resnetfeats, out_c, kernel_size, bias=bias)
+=======
         self.tail_r = conv(n_feat + scale_resnetfeats, 3, kernel_size, bias=bias)
         self.tail_t = conv(n_feat + scale_resnetfeats, 3, kernel_size, bias=bias)
         self.nam2_r = NAM(n_feat + scale_resnetfeats, kernel_size=1, bias=bias, cha=3)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
     def forward(self, x2_img, x2_raw):
         H = x2_img.size(2)
@@ -1486,11 +1692,42 @@ class RAWRRNet(nn.Module):
 
         x1_img = x2_img
         x1_raw = x2_raw
+<<<<<<< HEAD
+=======
 
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         ##-------------------------------------------
         ##-------------- Stage 1---------------------
         ##-------------------------------------------
         ## Compute Shallow Features
+<<<<<<< HEAD
+        x1_r = self.shallow_feat1_r(x1_raw)
+
+        ## Process features through Encoder of Stage 1
+        feat1_r = self.stage1_encoder_r(x1_r)
+
+        ## Pass features through Decoders of Stage 1
+        res1_r = self.stage1_decoder_r(feat1_r)
+
+        ## Generate reflection layer
+        # stage1_r = self.amp_r(res1_r[0], x2_raw)
+        stage1_r = self.stage1_rconv(res1_r[0]) + x2_raw
+
+        ## Apply Non-local Attention Module (NAM)
+        x1_namfeats_r = self.scam1_r(res1_r[0], x2_raw)
+        # x1_namfeats_r = res1_r[0]
+
+        ## Same operations for t in stage 1
+        x1_t = self.shallow_feat1_t(x1_raw)
+        x1_t = self.concat1_t(torch.cat([x1_t, x1_namfeats_r], 1))
+        feat1_t = self.stage1_encoder_t(x1_t)
+        res1_t = self.stage1_decoder_t(feat1_t)
+        # stage1_t = self.amp_t(res1_t[0], x2_raw)
+        stage1_t = self.stage1_tconv(res1_t[0]) + x2_raw
+        x1_namfeats_t = self.scam1_t(res1_t[0], stage1_t)
+        # x1_namfeats_t = res1_t[0]
+
+=======
         x1 = self.shallow_feat1(x1_raw)
 
         ## Process features through Encoder of Stage 1
@@ -1509,6 +1746,7 @@ class RAWRRNet(nn.Module):
         res1_t = self.stage1_decoder_t(feat1)
         stage1_t = self.stage1_tconv(res1_t[0]) + x2_raw
         x1_namfeats_t = self.nam1_t(res1_t[0], stage1_t)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         ##-------------------------------------------
         ##-------------- Stage 2---------------------
@@ -1517,6 +1755,20 @@ class RAWRRNet(nn.Module):
         x2_r = self.shallow_feat2_r(x2_img)
 
         ## Concatenate NAM features of Stage 2 with shallow features of Stage 3
+<<<<<<< HEAD
+        # x2_namfeats_r = self.RRM_r(x1_namfeats_r, x2_img)
+        # x2_namfeats_t = self.RRM_t(x1_namfeats_t, x2_img)
+        x2_namfeats = self.RRM(x1_namfeats_r, x1_namfeats_t)
+
+        x2_r = self.concat2_r(torch.cat([x2_r, x2_namfeats], 1))
+        x2_r = self.stage2_orsnet_r(x2_r, feat1_r, res1_r)
+        stage2_r = self.tail_r(x2_r) + x2_img
+        x2_r_nam = x2_r
+
+        x2_t = self.shallow_feat2_t(x2_img)
+        x2_t = self.concat2_t(torch.cat([x2_t, x2_r_nam, x2_namfeats], 1))
+        x2_t = self.stage2_orsnet_t(x2_t, feat1_t, res1_t)
+=======
         x2_namfeats = self.RRM(x1_namfeats_r, x1_namfeats_t)
 
         x2_r = self.concat2_r(torch.cat([x2_r, x2_namfeats], 1))
@@ -1527,6 +1779,7 @@ class RAWRRNet(nn.Module):
         x2_t = self.shallow_feat2_t(x2_img)
         x2_t = self.concat2_t(torch.cat([x2_t, x2_r_nam, x2_namfeats], 1))
         x2_t = self.stage2_orsnet_t(x2_t, feat1, res1_t)
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         stage2_t = self.tail_t(x2_t) + x2_img
 
         return [stage2_r, stage2_t], [stage1_r, stage1_t]

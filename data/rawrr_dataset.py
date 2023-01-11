@@ -41,6 +41,14 @@ def pack(image, pattern='RGGB'):
         image1[..., 3] = image[0::2, 1::2]
         image1[..., 0] = image[1::2, 0::2]
         image1[..., 2] = image[1::2, 1::2]
+<<<<<<< HEAD
+    elif pattern == 'BGGR':
+        image1[..., 3] = image[0::2, 0::2]
+        image1[..., 1] = image[0::2, 1::2]
+        image1[..., 2] = image[1::2, 0::2]
+        image1[..., 0] = image[1::2, 1::2]
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
     return image1
 
 
@@ -172,8 +180,17 @@ class RAWRRDataset(BaseDataset):
                 rawB_img = cv2.imread(rawB_path, -1)
 
                 if 'huawei' in rgbA1_path:
+<<<<<<< HEAD
+                    if '137' in rgbA1_path:
+                        imgs = self.crop({'I_rgb': rgbB_img, 'T_rgb': rgbA1_img, 'R_rgb': rgbA2_img, 'I_raw': rawB_img,
+                                          'T_raw': rawA1_img, 'R_raw': rawA2_img}, pattern='GRBG')
+                    else:
+                        imgs = self.crop({'I_rgb': rgbB_img, 'T_rgb': rgbA1_img, 'R_rgb': rgbA2_img, 'I_raw': rawB_img,
+                                          'T_raw': rawA1_img, 'R_raw': rawA2_img}, pattern='BGGR')
+=======
                     imgs = self.crop({'I_rgb': rgbB_img, 'T_rgb': rgbA1_img, 'R_rgb': rgbA2_img, 'I_raw': rawB_img,
                                       'T_raw':rawA1_img, 'R_raw': rawA2_img}, pattern='GRBG')
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
                 else:
                     imgs = self.crop({'I_rgb': rgbB_img, 'T_rgb': rgbA1_img, 'R_rgb': rgbA2_img, 'I_raw': rawB_img,
                                       'T_raw': rawA1_img, 'R_raw': rawA2_img}, pattern='RGGB')
@@ -200,6 +217,28 @@ class RAWRRDataset(BaseDataset):
         else:
             rgbA1_path = self.rgbA1_paths[index]
             rawA1_path = self.rawA1_paths[index]
+<<<<<<< HEAD
+            rgbA2_path = self.rgbA2_paths[index]
+            rawA2_path = self.rawA2_paths[index]
+            rgbB_path = self.rgbB_paths[index]
+            rawB_path = self.rawB_paths[index]
+            rgbA1_img = np.asarray(Image.open(rgbA1_path).convert('RGB'))
+            rgbA2_img = np.asarray(Image.open(rgbA2_path).convert('RGB'))
+            rgbB_img = np.asarray(Image.open(rgbB_path).convert('RGB'))
+            rawA1_img = cv2.imread(rawA1_path, -1)
+            rawA2_img = cv2.imread(rawA2_path, -1)
+            rawB_img = cv2.imread(rawB_path, -1)
+
+            if 'huawei' in rgbA1_path:
+                if '135' in rgbA1_path or '138' in rgbA1_path or '140' in rgbA1_path:
+                    rawA1_img = pack(rawA1_img, pattern='GRBG')
+                    rawA2_img = pack(rawA2_img, pattern='GRBG')
+                    rawB_img = pack(rawB_img, pattern='GRBG')
+                else:
+                    rawA1_img = pack(rawA1_img, pattern='BGGR')
+                    rawA2_img = pack(rawA2_img, pattern='BGGR')
+                    rawB_img = pack(rawB_img, pattern='BGGR')
+=======
             rgbB_path = self.rgbB_paths[index]
             rawB_path = self.rawB_paths[index]
             rgbA1_img = np.asarray(Image.open(rgbA1_path).convert('RGB'))
@@ -213,6 +252,7 @@ class RAWRRDataset(BaseDataset):
                 rawA1_img = pack(rawA1_img, pattern='GRBG')
                 rawA2_img = pack(rawA2_img, pattern='GRBG')
                 rawB_img = pack(rawB_img, pattern='GRBG')
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
             else:
                 rawA1_img = pack(rawA1_img, pattern='RGGB')
                 rawA2_img = pack(rawA2_img, pattern='RGGB')
@@ -248,13 +288,30 @@ class RAWRRDataset(BaseDataset):
         rgbB = self.transform_B(rgbB_img)
 
         if 'huawei' in rgbA1_path:
+<<<<<<< HEAD
+            rawA1_img = (rawA1_img - 256) / 3839
+            rawA2_img = (rawA2_img - 256) / 3839
+            rawB_img = (rawB_img - 256) / 3839
+=======
             rawA1_img = (rawA1_img - 256) / 4095
             rawA2_img = (rawA2_img - 256) / 4095
             rawB_img = (rawB_img - 256) / 4095
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         else:
             rawA1_img = (rawA1_img - 400) / 15983
             rawA2_img = (rawA2_img - 400) / 15983
             rawB_img = (rawB_img - 400) / 15983
+<<<<<<< HEAD
+        # rawA1_img = rawA1_img / 65535.
+        # rawA2_img = rawA2_img / 65535.
+        # rawB_img = rawB_img / 65535.
+
+        # rawA1_img = rawA1_img / np.max(rawA1_img)
+        # rawA2_img = rawA2_img / np.max(rawA2_img)
+        # rawB_img = rawB_img / np.max(rawB_img)
+
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         rawA1 = torch.from_numpy(np.transpose(rawA1_img, (2, 0, 1)))
         rawA2 = torch.from_numpy(np.transpose(rawA2_img, (2, 0, 1)))
         rawB = torch.from_numpy(np.transpose(rawB_img, (2, 0, 1)))
@@ -335,15 +392,29 @@ class TestDataset(BaseDataset):
         rawB_img = cv2.imread(rawB_path, -1)
 
         if 'huawei' in rgbA1_path:
+<<<<<<< HEAD
+            if '135' in rgbA1_path or '138' in rgbA1_path or '140' in rgbA1_path:
+                rawA1_img = pack(rawA1_img, pattern='GRBG')
+                rawA2_img = pack(rawA2_img, pattern='GRBG')
+                rawB_img = pack(rawB_img, pattern='GRBG')
+            else:
+                rawA1_img = pack(rawA1_img, pattern='BGGR')
+                rawA2_img = pack(rawA2_img, pattern='BGGR')
+                rawB_img = pack(rawB_img, pattern='BGGR')
+=======
             rawA1_img = pack(rawA1_img, pattern='GRBG')
             rawA2_img = pack(rawA2_img, pattern='GRBG')
             rawB_img = pack(rawB_img, pattern='GRBG')
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         else:
             rawA1_img = pack(rawA1_img, pattern='RGGB')
             rawA2_img = pack(rawA2_img, pattern='RGGB')
             rawB_img = pack(rawB_img, pattern='RGGB')
         is_real_int = 1
+<<<<<<< HEAD
+=======
         is_real_int = 1
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         h, w, c = rgbA1_img.shape
         if h > w:
@@ -365,14 +436,31 @@ class TestDataset(BaseDataset):
         rgbA2 = self.transform_A(rgbA2_img)
         rgbB = self.transform_B(rgbB_img)
 
+<<<<<<< HEAD
+        # rawA1_img = rawA1_img / 65535.
+        # rawA2_img = rawA2_img / 65535.
+        # rawB_img = rawB_img / 65535.
+
+        if 'huawei' in rgbA1_path:
+            rawA1_img = (rawA1_img - 256) / 3839
+            rawA2_img = (rawA2_img - 256) / 3839
+            rawB_img = (rawB_img - 256) / 3839
+=======
         if 'huawei' in rgbA1_path:
             rawA1_img = (rawA1_img - 256) / 4095
             rawA2_img = (rawA2_img - 256) / 4095
             rawB_img = (rawB_img - 256) / 4095
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         else:
             rawA1_img = (rawA1_img - 400) / 15983
             rawA2_img = (rawA2_img - 400) / 15983
             rawB_img = (rawB_img - 400) / 15983
+<<<<<<< HEAD
+        # rawA1_img = rawA1_img / np.max(rawA1_img)
+        # rawA2_img = rawA2_img / np.max(rawA2_img)
+        # rawB_img = rawB_img / np.max(rawB_img)
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
         rawA1 = torch.from_numpy(np.transpose(rawA1_img, (2, 0, 1)))
         rawA2 = torch.from_numpy(np.transpose(rawA2_img, (2, 0, 1)))

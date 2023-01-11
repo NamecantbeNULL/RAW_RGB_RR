@@ -26,7 +26,11 @@ See options/base_options.py and options/test_options.py for more test options.
 See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
 See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 """
+<<<<<<< HEAD
+import os, time
+=======
 import os
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 import torch
 from options.test_options import TestOptions
 from data import create_dataset
@@ -76,11 +80,25 @@ if __name__ == '__main__':
 
     if opt.eval:
         model.eval()
+<<<<<<< HEAD
+
+    total_test_time = 0.
+    for i, data in enumerate(dataset):
+        iter_start_time = time.time()
+        if i >= opt.num_test:  # only apply our model to opt.num_test images.
+            break
+        model.set_input(data)  # unpack data from data loader
+        t_data = time.time() - iter_start_time
+        test_start_time = time.time()
+        model.test()           # run inference
+        total_test_time += (time.time() - test_start_time)
+=======
     for i, data in enumerate(dataset):
         if i >= opt.num_test:  # only apply our model to opt.num_test images.
             break
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
         visuals = model.get_current_visuals()  # get image results
         img_path = model.get_image_paths()     # get image paths
 
@@ -94,4 +112,8 @@ if __name__ == '__main__':
                     message += "%.8f " % loss_2T
                 print(message)
         save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
+<<<<<<< HEAD
+    print('The average test time for each image... %.8f sec' % (total_test_time / 43))
+=======
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
     webpage.save()  # save the HTML

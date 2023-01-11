@@ -1,9 +1,29 @@
 # Real-scene Reflection Removal with RAW-RGB Image Pairs
+<<<<<<< HEAD
+
+An official implementation code for paper "Real-scene Reflection Removal with RAW-RGB Image Pairs"
+
+> **Abstract:** 
+Most brands of modern consumer digital cameras nowadays are able to provide RAW-RGB image pairs conveniently, even in the automatic mode. RAW images store pixel
+intensities linearly related to the radiance, which could be beneficial for the image reflection removal (IRR) task. 
+However, existing IRR solutions, usually directly restoring the background in the non-linear RGB domain, severely overlook the valuable information conveyed by readily-available RAW images. Such
+a negligence may limit the performance of IRR methods on real-scene images. 
+To mitigate this deficiency, we propose a Cascaded RAW and RGB Restoration Network (CR3Net) by leveraging both the RGB images and their paired RAW versions. 
+Specifically, we firstly separate background and reflection layers in the linear RAW domain, and then restore the two layers in the non-linear RGB format by converting RAW features into the
+RGB domain. 
+A novel RAW-to-RGB module (RRM) is devised to upsample these features and mimic pointwise mappings in the camera image signal processor (ISP). 
+In addition, we collect the first real-world dataset that contains paired RAW and RGB images for IRR. Compared with state-of-the-art approaches, our method achieves a significant performance gain of about 2.07dB
+in PSNR, 0.028 in SSIM, and 0.0123 in LPIPS tested on the captured dataset. 
+
+## Network Architecture
+![CR3Net](imgs/Framework.png)
+=======
 (Updating)
 
 An official implementation code for paper "Real-scene Reflection Removal with RAW-RGB Image Pairs"
 
 ## Introduction
+>>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
 ## Requisites
 
