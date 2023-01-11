@@ -16,13 +16,7 @@ in PSNR, 0.028 in SSIM, and 0.0123 in LPIPS tested on the captured dataset.
 
 ## Network Architecture
 ![CR3Net](imgs/Framework.png)
-=======
-(Updating)
 
-An official implementation code for paper "Real-scene Reflection Removal with RAW-RGB Image Pairs"
-
-## Introduction
->>>>>>> 9047eaec17224b93a1fd802e3e3485e7abb8d912
 
 ## Requisites
 
